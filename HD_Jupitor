@@ -1,4 +1,4 @@
-from azureml.train.hyperdrive import BayesianParameterSampling
+from azureml.train.hyperdrive import BayesianParameterSampling, BanditPolicy, HyperDriveConfig
 from azureml.train.hyperdrive import uniform, choice
 
 param_sampling = BayesianParameterSampling( {
@@ -48,5 +48,6 @@ print('\n Accuracy:', best_run_metrics['accuracy'])
 print('\n learning rate:',parameter_values[3])
 print('\n keep probability:',parameter_values[5])
 print('\n batch size:',parameter_values[7])
+
 
 
