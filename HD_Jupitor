@@ -14,7 +14,7 @@ param_sampling = BayesianParameterSampling( {
         #delay_evaluation=5  # Number of iterations to wait before evaluating
 )
     #Estimator
-    src = ScriptRunConfig(source_directory='.',  # Directory where train.py is located
+    src = SKLearn(source_directory='.',  # Directory where train.py is located
                       script='train.py',  # Your training script
                       compute_target= 'MLProj',
                       environment=env)  # Your environment
