@@ -1,0 +1,52 @@
+from azureml.train.hyperdrive import BayesianParameterSampling
+from azureml.train.hyperdrive import uniform, choice
+
+param_sampling = BayesianParameterSampling( {
+        "--max_iter": uniform(10,20,30),
+        "--C": choice(0.5, 1, 1.5)
+    }
+)    
+
+    # Define a Bandit policy
+    policy = BanditPolicy(
+        slack_factor=0.1,  # The slack factor to allow for some variability
+        evaluation_interval=1  # How often to evaluate the performance
+        #delay_evaluation=5  # Number of iterations to wait before evaluating
+)
+    #Estimator
+    src = ScriptRunConfig(source_directory='.',  # Directory where train.py is located
+                      script='train.py',  # Your training script
+                      compute_target= 'MLProj',
+                      environment=env)  # Your environment
+
+    #Estimator
+    est = SKLearn(source_directory='./training',  # Directory where train.py is located
+                      script='train.py',  # Your training script
+                      compute_target= 'MLProj')
+
+    #HyperdriveConfig
+    hyperdrive_config = HyperDriveConfig(
+        estimator= est,  # Your script run configuration
+        hyperparameter_sampling= param_sampling,
+        policy=policy,  # Include the early stopping policy
+        primary_metric_name='Accuracy',  # Metric to optimize
+        primary_metric_goal=PrimaryMetricGoal.MAXIMIZE,  # Goal to optimize
+        max_total_runs=20,  # Total number of runs
+        max_concurrent_runs=4, # Number of concurrent runs
+)
+
+hdr = exp.submit(hyperdrive_config)
+
+RunDetails(hdr).show()
+
+best_run = hyperdrive_run.get_best_run_by_primary_metric()
+best_run_metrics = best_run.get_metrics()
+parameter_values = best_run.get_details()['runDefinition']['Arguments']
+
+print('Best Run Id: ', best_run.id)
+print('\n Accuracy:', best_run_metrics['accuracy'])
+print('\n learning rate:',parameter_values[3])
+print('\n keep probability:',parameter_values[5])
+print('\n batch size:',parameter_values[7])
+
+
